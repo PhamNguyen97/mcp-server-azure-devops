@@ -296,7 +296,7 @@ export function createAzureDevOpsServer(config: AzureDevOpsConfig): Server {
 
       // Route the request to the appropriate feature handler
       if (isWorkItemsRequest(request)) {
-        return await handleWorkItemsRequest(connection, request);
+        return await handleWorkItemsRequest(connection, request, config);
       }
 
       if (isProjectsRequest(request)) {

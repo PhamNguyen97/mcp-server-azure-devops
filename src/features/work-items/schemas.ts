@@ -54,8 +54,12 @@ export const CreateWorkItemSchema = z.object({
   description: z
     .string()
     .optional()
+    .describe('Work item description in HTML format.'),
+  acceptanceCriteria: z
+    .string()
+    .optional()
     .describe(
-      'Work item description in HTML format. Multi-line text fields (i.e., System.History, AcceptanceCriteria, etc.) must use HTML format. Do not use CDATA tags.',
+      'Acceptance criteria in HTML format. Only applicable to User Stories and Features. Maps to Microsoft.VSTS.Common.AcceptanceCriteria field.',
     ),
   assignedTo: z
     .string()
@@ -88,8 +92,12 @@ export const UpdateWorkItemSchema = z.object({
   description: z
     .string()
     .optional()
+    .describe('Work item description in HTML format.'),
+  acceptanceCriteria: z
+    .string()
+    .optional()
     .describe(
-      'Work item description in HTML format. Multi-line text fields (i.e., System.History, AcceptanceCriteria, etc.) must use HTML format. Do not use CDATA tags.',
+      'Acceptance criteria in HTML format. Only applicable to User Stories and Features. Maps to Microsoft.VSTS.Common.AcceptanceCriteria field.',
     ),
   assignedTo: z
     .string()

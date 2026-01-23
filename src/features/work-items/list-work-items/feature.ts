@@ -14,13 +14,10 @@ import { ListWorkItemsOptions, WorkItem as WorkItemType } from '../types';
 /**
  * Constructs the default WIQL query for listing work items
  */
-function constructDefaultWiql(projectId: string, teamId?: string): string {
-  let query = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${projectId}'`;
-  if (teamId) {
-    query += ` AND [System.TeamId] = '${teamId}'`;
-  }
-  query += ' ORDER BY [System.Id]';
-  return query;
+function constructDefaultWiql(projectId: string): string {
+  // Note: teamId filtering is handled by TeamContext, not in the WIQL query
+  // System.TeamId is not a valid WIQL field
+  return `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${projectId}' ORDER BY [System.Id]`;
 }
 
 /**
@@ -48,7 +45,7 @@ export async function listWorkItems(
       const queryResult = await witApi.queryById(queryId, teamContext);
       workItemRefs = queryResult.workItems || [];
     } else {
-      const query = wiql || constructDefaultWiql(projectId, teamId);
+      const query = wiql || constructDefaultWiql(projectId);
       const teamContext: TeamContext = {
         project: projectId,
         team: teamId,

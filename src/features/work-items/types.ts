@@ -21,6 +21,7 @@ export interface ListWorkItemsOptions {
 export interface CreateWorkItemOptions {
   title: string;
   description?: string;
+  acceptanceCriteria?: string;
   assignedTo?: string;
   areaPath?: string;
   iterationPath?: string;
@@ -35,6 +36,7 @@ export interface CreateWorkItemOptions {
 export interface UpdateWorkItemOptions {
   title?: string;
   description?: string;
+  acceptanceCriteria?: string;
   assignedTo?: string;
   areaPath?: string;
   iterationPath?: string;

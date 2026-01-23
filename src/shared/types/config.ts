@@ -29,4 +29,12 @@ export interface AzureDevOpsConfig {
    * Optional API version to use (defaults to latest)
    */
   apiVersion?: string;
+
+  /**
+   * Optional comma-separated list of allowed team board names.
+   * If specified, only work items from these team boards are accessible.
+   * If not specified, all board access is blocked for security.
+   * Example: "Team Alpha,Team Beta,Backend Team"
+   */
+  allowedTeamBoards?: string;
 }

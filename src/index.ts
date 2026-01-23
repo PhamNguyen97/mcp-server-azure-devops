@@ -8,6 +8,28 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import dotenv from 'dotenv';
 import { AzureDevOpsConfig } from './shared/types';
 import { AuthenticationMethod } from './shared/auth/auth-factory';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
+
+// Debug log file location
+const DEBUG_LOG_PATH = join(
+  process.env.USERPROFILE || process.env.HOME || '.',
+  'mcp-azure-devops-debug.log',
+);
+
+function debugLog(message: string): void {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  process.stderr.write(logMessage);
+  try {
+    writeFileSync(DEBUG_LOG_PATH, logMessage, { flag: 'a' });
+  } catch {
+    // Ignore file write errors
+  }
+}
+
+// Make debugLog globally available
+(global as unknown as Record<string, typeof debugLog>).debugLog = debugLog;
 
 /**
  * Normalize auth method string to a valid AuthenticationMethod enum value
@@ -57,6 +79,7 @@ function getConfig(): AzureDevOpsConfig {
   AZURE_DEVOPS_PAT: ${process.env.AZURE_DEVOPS_PAT ? 'SET (hidden)' : 'NOT SET'}
   AZURE_DEVOPS_DEFAULT_PROJECT: ${process.env.AZURE_DEVOPS_DEFAULT_PROJECT || 'NOT SET'}
   AZURE_DEVOPS_API_VERSION: ${process.env.AZURE_DEVOPS_API_VERSION || 'NOT SET'}
+  AZURE_DEVOPS_ALLOWED_TEAM_BOARDS: ${process.env.AZURE_DEVOPS_ALLOWED_TEAM_BOARDS || 'NOT SET'}
   NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}
 \n`);
 
@@ -66,6 +89,7 @@ function getConfig(): AzureDevOpsConfig {
     personalAccessToken: process.env.AZURE_DEVOPS_PAT,
     defaultProject: process.env.AZURE_DEVOPS_DEFAULT_PROJECT,
     apiVersion: process.env.AZURE_DEVOPS_API_VERSION,
+    allowedTeamBoards: process.env.AZURE_DEVOPS_ALLOWED_TEAM_BOARDS,
   };
 }
 

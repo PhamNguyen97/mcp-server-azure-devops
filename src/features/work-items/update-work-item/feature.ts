@@ -43,6 +43,14 @@ export async function updateWorkItem(
       });
     }
 
+    if (options.acceptanceCriteria) {
+      document.push({
+        op: 'add',
+        path: '/fields/Microsoft.VSTS.Common.AcceptanceCriteria',
+        value: options.acceptanceCriteria,
+      });
+    }
+
     if (options.assignedTo) {
       document.push({
         op: 'add',

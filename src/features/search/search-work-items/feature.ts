@@ -44,10 +44,18 @@ export async function searchWorkItems(
     const authHeader = await getAuthorizationHeader();
 
     // Extract organization and project from the connection URL
-    const { organization, project } = extractOrgAndProject(
+    const { organization, project, isOnPremise } = extractOrgAndProject(
       connection,
       options.projectId,
     );
+
+    // On-premise TFS may not support the search API
+    if (isOnPremise) {
+      throw new AzureDevOpsValidationError(
+        'Work item search is not supported for on-premise TFS/Azure DevOps Server. ' +
+          'Please use list_work_items with WIQL queries instead.',
+      );
+    }
 
     // Make the search API request
     // If projectId is provided, include it in the URL, otherwise perform organization-wide search
@@ -108,15 +116,28 @@ export async function searchWorkItems(
  *
  * @param connection The Azure DevOps WebApi connection
  * @param projectId The project ID or name (optional)
- * @returns The organization and project
+ * @returns The organization, project, and whether it's on-premise
  */
 function extractOrgAndProject(
   connection: WebApi,
   projectId?: string,
-): { organization: string; project: string } {
+): { organization: string; project: string; isOnPremise: boolean } {
   // Extract organization from the connection URL
+  // Supports both dev.azure.com/{org} and on-premise TFS {server}/{collection}
   const url = connection.serverUrl;
-  const match = url.match(/https?:\/\/dev\.azure\.com\/([^/]+)/);
+
+  // Try dev.azure.com format first
+  let match = url.match(/https?:\/\/dev\.azure\.com\/([^/]+)/);
+  if (match) {
+    return {
+      organization: match[1],
+      project: projectId || '',
+      isOnPremise: false,
+    };
+  }
+
+  // Try on-premise TFS format: https://{server}/{collection}
+  match = url.match(/https?:\/\/[^/]+\/([^/?#]+)/);
   const organization = match ? match[1] : '';
 
   if (!organization) {
@@ -128,6 +149,7 @@ function extractOrgAndProject(
   return {
     organization,
     project: projectId || '',
+    isOnPremise: true,
   };
 }
 

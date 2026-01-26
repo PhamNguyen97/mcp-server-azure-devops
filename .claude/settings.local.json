@@ -10,7 +10,8 @@
       "Bash(grep:*)",
       "Bash(npx eslint:*)",
       "Bash(git add:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

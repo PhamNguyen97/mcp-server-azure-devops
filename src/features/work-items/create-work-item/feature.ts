@@ -96,6 +96,38 @@ export async function createWorkItem(
       });
     }
 
+    // Add predecessor relationships if predecessorIds are provided
+    // A predecessor must complete before this work item can start (A → B)
+    // Uses System.LinkTypes.Dependency-Forward (B has a predecessor link to A)
+    if (options.predecessorIds && options.predecessorIds.length > 0) {
+      for (const predecessorId of options.predecessorIds) {
+        document.push({
+          op: 'add',
+          path: '/relations/-',
+          value: {
+            rel: 'System.LinkTypes.Dependency-Forward',
+            url: `${connection.serverUrl}/_apis/wit/workItems/${predecessorId}`,
+          },
+        });
+      }
+    }
+
+    // Add successor relationships if successorIds are provided
+    // A successor cannot start until this work item completes (B → A)
+    // Uses System.LinkTypes.Dependency-Reverse (B has a successor link to A)
+    if (options.successorIds && options.successorIds.length > 0) {
+      for (const successorId of options.successorIds) {
+        document.push({
+          op: 'add',
+          path: '/relations/-',
+          value: {
+            rel: 'System.LinkTypes.Dependency-Reverse',
+            url: `${connection.serverUrl}/_apis/wit/workItems/${successorId}`,
+          },
+        });
+      }
+    }
+
     // Add any additional fields
     if (options.additionalFields) {
       for (const [key, value] of Object.entries(options.additionalFields)) {

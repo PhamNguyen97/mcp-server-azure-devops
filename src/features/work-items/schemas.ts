@@ -75,6 +75,18 @@ export const CreateWorkItemSchema = z.object({
     .number()
     .optional()
     .describe('The ID of the parent work item to create a relationship with'),
+  predecessorIds: z
+    .array(z.number())
+    .optional()
+    .describe(
+      'IDs of work items that are predecessors. A predecessor must complete before this work item can start. (A is predecessor of B means A → B)',
+    ),
+  successorIds: z
+    .array(z.number())
+    .optional()
+    .describe(
+      'IDs of work items that are successors. A successor cannot start until this work item completes. (A is successor of B means B → A)',
+    ),
   additionalFields: z
     .record(z.string(), z.any())
     .optional()
@@ -116,6 +128,18 @@ export const UpdateWorkItemSchema = z.object({
     .optional()
     .describe('The updated priority of the work item'),
   state: z.string().optional().describe('The updated state of the work item'),
+  predecessorIds: z
+    .array(z.number())
+    .optional()
+    .describe(
+      'IDs of work items that are predecessors. A predecessor must complete before this work item can start. (A is predecessor of B means A → B)',
+    ),
+  successorIds: z
+    .array(z.number())
+    .optional()
+    .describe(
+      'IDs of work items that are successors. A successor cannot start until this work item completes. (A is successor of B means B → A)',
+    ),
   additionalFields: z
     .record(z.string(), z.any())
     .optional()

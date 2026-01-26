@@ -27,6 +27,8 @@ export interface CreateWorkItemOptions {
   iterationPath?: string;
   priority?: number;
   parentId?: number;
+  predecessorIds?: number[];
+  successorIds?: number[];
   additionalFields?: Record<string, string | number | boolean | null>;
 }
 
@@ -42,6 +44,8 @@ export interface UpdateWorkItemOptions {
   iterationPath?: string;
   priority?: number;
   state?: string;
+  predecessorIds?: number[];
+  successorIds?: number[];
   additionalFields?: Record<string, string | number | boolean | null>;
 }
 

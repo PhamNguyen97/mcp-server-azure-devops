@@ -280,6 +280,8 @@ export const handleWorkItemsRequest: RequestHandler = async (
           iterationPath: args.iterationPath,
           priority: args.priority,
           parentId: args.parentId,
+          predecessorIds: args.predecessorIds,
+          successorIds: args.successorIds,
           additionalFields: args.additionalFields,
         },
       );
@@ -309,6 +311,8 @@ export const handleWorkItemsRequest: RequestHandler = async (
         iterationPath: args.iterationPath,
         priority: args.priority,
         state: args.state,
+        predecessorIds: args.predecessorIds,
+        successorIds: args.successorIds,
         additionalFields: args.additionalFields,
       });
       return {

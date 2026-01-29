@@ -131,6 +131,7 @@ describe('Projects Request Handlers', () => {
           projectId: 'Project 1',
           includeTeams: true,
         }),
+        undefined, // config is optional and not passed in this test
       );
     });
 

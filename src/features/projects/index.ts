@@ -18,6 +18,7 @@ import {
   RequestHandler,
 } from '../../shared/types/request-handler';
 import { defaultProject } from '../../utils/environment';
+import { AzureDevOpsConfig } from '../../shared/types';
 import {
   GetProjectSchema,
   GetProjectDetailsSchema,
@@ -45,6 +46,7 @@ export const isProjectsRequest: RequestIdentifier = (
 export const handleProjectsRequest: RequestHandler = async (
   connection: WebApi,
   request: CallToolRequest,
+  config?: AzureDevOpsConfig,
 ): Promise<{ content: Array<{ type: string; text: string }> }> => {
   switch (request.params.name) {
     case 'list_projects': {
@@ -71,14 +73,18 @@ export const handleProjectsRequest: RequestHandler = async (
     }
     case 'get_project_details': {
       const args = GetProjectDetailsSchema.parse(request.params.arguments);
-      const result = await getProjectDetails(connection, {
-        projectId: args.projectId ?? defaultProject,
-        includeProcess: args.includeProcess,
-        includeWorkItemTypes: args.includeWorkItemTypes,
-        includeFields: args.includeFields,
-        includeTeams: args.includeTeams,
-        expandTeamIdentity: args.expandTeamIdentity,
-      });
+      const result = await getProjectDetails(
+        connection,
+        {
+          projectId: args.projectId ?? defaultProject,
+          includeProcess: args.includeProcess,
+          includeWorkItemTypes: args.includeWorkItemTypes,
+          includeFields: args.includeFields,
+          includeTeams: args.includeTeams,
+          expandTeamIdentity: args.expandTeamIdentity,
+        },
+        config,
+      );
       return {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       };

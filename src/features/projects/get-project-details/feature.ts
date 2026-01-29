@@ -8,6 +8,11 @@ import {
   WebApiTeam,
 } from 'azure-devops-node-api/interfaces/CoreInterfaces';
 import { WorkItemField } from 'azure-devops-node-api/interfaces/WorkItemTrackingInterfaces';
+import { AzureDevOpsConfig } from '../../../shared/types';
+import {
+  parseAllowedTeamBoards,
+  isTeamAllowed,
+} from '../../../utils/team-board-validation';
 
 // Type for work item type field with additional properties
 interface WorkItemTypeField extends WorkItemField {
@@ -91,12 +96,14 @@ interface ProjectDetails extends TeamProject {
  *
  * @param connection The Azure DevOps WebApi connection
  * @param options Options for getting project details
+ * @param config Optional Azure DevOps configuration for team filtering
  * @returns The project details
  * @throws {AzureDevOpsResourceNotFoundError} If the project is not found
  */
 export async function getProjectDetails(
   connection: WebApi,
   options: GetProjectDetailsOptions,
+  config?: AzureDevOpsConfig,
 ): Promise<ProjectDetails> {
   try {
     const {
@@ -132,8 +139,24 @@ export async function getProjectDetails(
 
     // If teams are requested, get them
     if (includeTeams) {
-      const teams = await coreApi.getTeams(projectId, expandTeamIdentity);
-      result.teams = teams;
+      const allTeams = await coreApi.getTeams(projectId, expandTeamIdentity);
+
+      // If config is provided with allowedTeamBoards, filter teams
+      if (config && config.allowedTeamBoards) {
+        const allowedTeams = parseAllowedTeamBoards(config.allowedTeamBoards);
+        if (allowedTeams && allowedTeams.length > 0) {
+          // Filter teams to only include allowed teams
+          result.teams = allTeams.filter((team) =>
+            team.name ? isTeamAllowed(allowedTeams, team.name) : false,
+          );
+        } else {
+          // No allowed teams configured, return empty array
+          result.teams = [];
+        }
+      } else {
+        // No config or no allowedTeamBoards specified, return all teams
+        result.teams = allTeams;
+      }
     }
 
     // If process information is requested, get it
